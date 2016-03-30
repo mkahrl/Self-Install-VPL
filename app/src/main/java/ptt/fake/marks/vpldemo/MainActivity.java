@@ -10,6 +10,7 @@ package ptt.fake.marks.vpldemo;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.ContentResolver;
 import android.net.Uri;
 import java.net.URL;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.provider.Settings.Secure;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,15 +33,29 @@ public class MainActivity extends Activity implements View.OnClickListener
     int totalBytesRead = 0;
     Dialog downloadFail;
     Dialog downloadSuccess;
+    Dialog unknownSources;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
-        new GetApkFromServer().execute(null);
-        progBar = (ProgressBar) findViewById(R.id.progress_bar);
-        progBar.setMax(100);
+        int unknownSources = 0;
+        ContentResolver cr = this.getContentResolver();
+
+        try {
+            unknownSources = Secure.getInt(cr, Secure.INSTALL_NON_MARKET_APPS);
+        }
+        catch(Exception e){}
+
+        if (unknownSources < 1) unkownSources();
+        else
+        {
+            new GetApkFromServer().execute(null);
+            progBar = (ProgressBar) findViewById(R.id.progress_bar);
+            progBar.setMax(100);
+
+        }
     }
 
     public void onClick(View v)
@@ -49,6 +65,11 @@ public class MainActivity extends Activity implements View.OnClickListener
         if ( id == R.id.fail_quit)
         {
             downloadFail.dismiss();
+            finish();
+        }
+        if ( id == R.id.unkown_src_quit)
+        {
+            unknownSources.dismiss();
             finish();
         }
 
@@ -157,4 +178,13 @@ public class MainActivity extends Activity implements View.OnClickListener
         downloadFail.findViewById(R.id.fail_quit).setOnClickListener(this);
         downloadFail.show();
     }
+
+    private void unkownSources()
+    {
+        unknownSources = new Dialog(MainActivity.this);
+        unknownSources.setContentView(R.layout.unknown_sources_check);
+        unknownSources.findViewById(R.id.unkown_src_quit).setOnClickListener(this);
+        unknownSources.show();
+    }
 }
+
