@@ -88,7 +88,6 @@ public class MainActivity extends Activity implements View.OnClickListener
         @Override
         protected void onProgressUpdate(Object[] o)
         {
-            System.out.println("onProgressUpdate() ...........   ");
             progBar.setProgress((totalBytesRead*100 / filesize));
             progBar.invalidate();
             System.out.println("Progress ..... " + (totalBytesRead * 100 / filesize));
@@ -97,7 +96,6 @@ public class MainActivity extends Activity implements View.OnClickListener
         @Override
         protected Object doInBackground(Object[] o)
         {
-            System.out.println("doInBackground ........... ");
             getApkFromServer();
             return null;
         }
@@ -105,7 +103,6 @@ public class MainActivity extends Activity implements View.OnClickListener
         @Override
         protected void onPostExecute(Object result)
         {
-            System.out.println("onPostExecute ........... ");
             if (apkRecieved)
             {
                 installAPK(localFile);
